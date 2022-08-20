@@ -30,12 +30,14 @@ defmodule PentoWeb.UserSessionControllerTest do
         })
 
       assert get_session(conn, :user_token)
-      assert redirected_to(conn) == "/"
+      assert "/" = redir_path = redirected_to(conn, 302)
+      conn = get(recycle(conn), redir_path)
+      assert "/guess" = redir_path = redirected_to(conn, 302)
 
       # Now do a logged in request and assert on the menu
-      conn = get(conn, "/")
+      conn = get(recycle(conn), redir_path)
       response = html_response(conn, 200)
-      assert response =~ user.email
+      assert response =~ user.username
       assert response =~ "Settings</a>"
       assert response =~ "Log out</a>"
     end

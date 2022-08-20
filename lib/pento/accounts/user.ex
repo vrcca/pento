@@ -4,6 +4,7 @@ defmodule Pento.Accounts.User do
 
   schema "users" do
     field :email, :string
+    field :username, :string
     field :password, :string, virtual: true, redact: true
     field :hashed_password, :string, redact: true
     field :confirmed_at, :naive_datetime
@@ -30,9 +31,21 @@ defmodule Pento.Accounts.User do
   """
   def registration_changeset(user, attrs, opts \\ []) do
     user
-    |> cast(attrs, [:email, :password])
+    |> cast(attrs, [:username, :email, :password])
+    |> validate_username()
     |> validate_email()
     |> validate_password(opts)
+  end
+
+  defp validate_username(changeset) do
+    changeset
+    |> validate_required([:username])
+    |> validate_format(:username, ~r/^[a-zA-Z0-9]+([_-]?[a-zA-Z0-9])*$/,
+      message: "accepts letters and numbers only"
+    )
+    |> validate_length(:username, min: 1, max: 60)
+    |> unsafe_validate_unique(:username, Pento.Repo)
+    |> unique_constraint(:username)
   end
 
   defp validate_email(changeset) do
