@@ -7,6 +7,8 @@ defmodule Pento.CatalogTest do
     alias Pento.Catalog.Product
 
     import Pento.CatalogFixtures
+    import Pento.AccountsFixtures
+    import Pento.SurveyFixtures
 
     @invalid_attrs %{description: nil, name: nil, sku: nil, unit_price: nil}
 
@@ -90,5 +92,27 @@ defmodule Pento.CatalogTest do
 
       assert {:error, %Ecto.Changeset{}} = Catalog.markdown_product(product, amount)
     end
+
+    test "list_products_with_user_rating/1 returns all products with ratings preloaded for the given user" do
+      user = user_fixture()
+      rating1 = rating_fixture(%{user: user})
+      rating2 = rating_fixture(%{user: user})
+      rating3 = rating_fixture() |> Repo.preload(:user)
+      assert result = Catalog.list_products_with_user_rating(user)
+      assert fetch_product!(result, rating1).ratings != []
+      assert fetch_product!(result, rating2).ratings != []
+      assert fetch_product!(result, rating3).ratings == []
+
+      assert result = Catalog.list_products_with_user_rating(rating3.user)
+      assert fetch_product!(result, rating1).ratings == []
+      assert fetch_product!(result, rating2).ratings == []
+      assert fetch_product!(result, rating3).ratings != []
+    end
+  end
+
+  defp fetch_product!(result, rating) do
+    product = Enum.find(result, fn product -> product.id == rating.product_id end)
+    refute is_nil(product)
+    product
   end
 end

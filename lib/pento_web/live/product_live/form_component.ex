@@ -11,6 +11,7 @@ defmodule PentoWeb.ProductLive.FormComponent do
      socket
      |> assign(assigns)
      |> assign(:changeset, changeset)
+     |> assign(:image_upload, nil)
      |> allow_upload(:image,
        accept: ~w(.jpg .jpeg .png),
        max_entries: 1,
@@ -74,7 +75,7 @@ defmodule PentoWeb.ProductLive.FormComponent do
   end
 
   defp save_product(socket, :new, params) do
-    result = Catalog.create_product(socket.assigns.product, product_params(socket, params))
+    result = Catalog.create_product(product_params(socket, params))
 
     case result do
       {:ok, _product} ->
