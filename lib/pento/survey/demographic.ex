@@ -5,7 +5,7 @@ defmodule Pento.Survey.Demographic do
   alias Pento.Accounts.User
 
   schema "demographics" do
-    field :gender, :string
+    field :gender, Ecto.Enum, values: [:male, :female, :other, :prefer_not_to_say]
     field :year_of_birth, :integer
     belongs_to :user, User
 
@@ -19,7 +19,6 @@ defmodule Pento.Survey.Demographic do
     demographic
     |> cast(attrs, [:gender, :year_of_birth, :user_id])
     |> validate_required([:gender, :year_of_birth, :user_id])
-    |> validate_inclusion(:gender, ["male", "female", "other", "prefer not to say"])
     |> validate_inclusion(:year_of_birth, 1900..current_year)
     |> unique_constraint(:user_id)
   end

@@ -34,7 +34,7 @@ defmodule Pento.SurveyTest do
       valid_attrs = %{gender: "female", year_of_birth: 1920, user_id: user_fixture().id}
 
       assert {:ok, %Demographic{} = demographic} = Survey.create_demographic(valid_attrs)
-      assert demographic.gender == "female"
+      assert demographic.gender == :female
       assert demographic.year_of_birth == 1920
     end
 
@@ -49,7 +49,7 @@ defmodule Pento.SurveyTest do
       assert {:ok, %Demographic{} = demographic} =
                Survey.update_demographic(demographic, update_attrs)
 
-      assert demographic.gender == "other"
+      assert demographic.gender == :other
       assert demographic.year_of_birth == 1921
     end
 
