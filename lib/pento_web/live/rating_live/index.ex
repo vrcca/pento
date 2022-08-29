@@ -1,6 +1,5 @@
 defmodule PentoWeb.RatingLive.Index do
-  use Phoenix.Component
-  use Phoenix.HTML
+  use PentoWeb, :component
   alias PentoWeb.RatingLive
 
   def products(assigns) do

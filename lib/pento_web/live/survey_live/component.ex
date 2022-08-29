@@ -1,5 +1,5 @@
 defmodule PentoWeb.SurveyLive.Component do
-  use Phoenix.Component
+  use PentoWeb, :component
 
   def hero(assigns) do
     ~H"""

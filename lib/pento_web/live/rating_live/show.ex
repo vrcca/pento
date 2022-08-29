@@ -1,6 +1,5 @@
 defmodule PentoWeb.RatingLive.Show do
-  use Phoenix.Component
-  use Phoenix.HTML
+  use PentoWeb, :component
 
   def stars(assigns) do
     ~H"""

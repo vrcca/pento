@@ -12,8 +12,22 @@ defmodule Pento.Catalog.Product.Query do
 
   def preload_user_ratings(query, user) do
     ratings_query = Rating.Query.preload_user(user)
+    preload(query, ratings: ^ratings_query)
+  end
 
+  def with_average_ratings(query \\ base()) do
     query
-    |> preload(ratings: ^ratings_query)
+    |> join_ratings
+    |> average_ratings
+  end
+
+  defp join_ratings(query) do
+    join(query, :inner, [p], r in assoc(p, :ratings))
+  end
+
+  defp average_ratings(query) do
+    query
+    |> group_by([p], p.id)
+    |> select([p, r], {p.name, avg(r.stars)})
   end
 end
