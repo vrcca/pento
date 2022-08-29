@@ -1,6 +1,7 @@
 defmodule Pento.Catalog.Product.Query do
   import Ecto.Query
   alias Pento.Catalog.Product
+  alias Pento.Survey.Demographic
   alias Pento.Survey.Rating
 
   def base, do: Product
@@ -29,5 +30,57 @@ defmodule Pento.Catalog.Product.Query do
     query
     |> group_by([p], p.id)
     |> select([p, r], {p.name, avg(r.stars)})
+  end
+
+  def join_users(query \\ base()) do
+    join(query, :left, [p, r], u in assoc(r, :user))
+  end
+
+  def join_demographics(query \\ base()) do
+    join(query, :left, [p, r, u, d], d in Demographic, on: d.user_id == u.id)
+  end
+
+  def with_zero_ratings(query \\ base()) do
+    select(query, [p], {p.name, 0})
+  end
+
+  def filter_by_age_group(query \\ base(), filter) do
+    apply_age_group(query, filter)
+  end
+
+  defp apply_age_group(query, "18 and under") do
+    birth_year = DateTime.utc_now().year - 18
+    where(query, [p, r, u, d], d.year_of_birth >= ^birth_year)
+  end
+
+  defp apply_age_group(query, "18 to 25") do
+    birth_year_min = DateTime.utc_now().year - 25
+    birth_year_max = DateTime.utc_now().year - 18
+
+    where(
+      query,
+      [p, r, u, d],
+      d.year_of_birth >= ^birth_year_min and d.year_of_birth <= ^birth_year_max
+    )
+  end
+
+  defp apply_age_group(query, "25 to 35") do
+    birth_year_min = DateTime.utc_now().year - 35
+    birth_year_max = DateTime.utc_now().year - 25
+
+    where(
+      query,
+      [p, r, u, d],
+      d.year_of_birth >= ^birth_year_min and d.year_of_birth <= ^birth_year_max
+    )
+  end
+
+  defp apply_age_group(query, "35 and up") do
+    birth_year = DateTime.utc_now().year - 35
+    where(query, [p, r, u, d], d.year_of_birth <= ^birth_year)
+  end
+
+  defp apply_age_group(query, _filter) do
+    query
   end
 end
