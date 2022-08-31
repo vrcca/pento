@@ -25,7 +25,11 @@ defmodule PentoWeb.Admin.SurveyResultsLive do
      |> assign_chart_svg()}
   end
 
-  defp assign_age_group_filter(socket, age_group_filter \\ "all") do
+  defp assign_age_group_filter(socket) do
+    assign_new(socket, :age_group_filter, fn -> "all" end)
+  end
+
+  defp assign_age_group_filter(socket, age_group_filter) do
     assign(socket, :age_group_filter, age_group_filter)
   end
 
@@ -53,7 +57,7 @@ defmodule PentoWeb.Admin.SurveyResultsLive do
   end
 
   defp assign_chart_svg(%{assigns: %{chart: chart}} = socket) do
-    assign(socket, :chart_svg, render_bar_chart(chart, title, subtitle, x_axis, y_axis))
+    assign(socket, :chart_svg, render_bar_chart(chart, title(), subtitle(), x_axis(), y_axis()))
   end
 
   defp title, do: "Product Ratings"
